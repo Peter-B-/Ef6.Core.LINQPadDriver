@@ -1,83 +1,72 @@
-using LINQPad;
-using LINQPad.Extensibility.DataContext;
-
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
-using System.Text;
+using LINQPad.Extensibility.DataContext;
 
 namespace Ef6.Core.LINQPadDriver
 {
-    public class StaticDriver : StaticDataContextDriver
+    public class EfDriver : StaticDataContextDriver
     {
-        static StaticDriver()
+        static EfDriver()
         {
             EnableDebugExceptions();
         }
 
-        [Conditional("DEBUG")]
-        private static void EnableDebugExceptions()
-        {
-            AppDomain.CurrentDomain.FirstChanceException += (sender, args) =>
-            {
-                if (args.Exception.StackTrace.Contains(typeof(StaticDriver).Namespace))
-                    Debugger.Launch();
-            };
-        }
+        public override string Author => "Peter Butzhammer";
 
         public override string Name => "Enitiy Framework 6 on .Net Core";
-
-        public override string Author => "Peter Butzhammer";
 
         public override string GetConnectionDescription(IConnectionInfo cxInfo)
             => cxInfo.CustomTypeInfo.GetCustomTypeDescription();
 
-        public override bool ShowConnectionDialog(IConnectionInfo cxInfo, ConnectionDialogOptions dialogOptions)
-            => new ConnectionDialog(cxInfo).ShowDialog() == true;
-
         public override List<ExplorerItem> GetSchema(IConnectionInfo cxInfo, Type customType)
         {
-            // Return the objects with which to populate the Schema Explorer by reflecting over customType.
-
-            // We'll start by retrieving all the properties of the custom type that implement IEnumerable<T>:
+            // Return all DbSet<T> properties of the DbContext
+            Debug();
             var topLevelProps =
-            (
-                from prop in customType.GetProperties()
-                where prop.PropertyType != typeof(string)
+                customType.GetProperties()
+                    .Where(p => p.PropertyType.IsGenericType &&
+                               p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>))
+                    .OrderBy(p => p.Name)
+                    .Select(p => new ExplorerItem(p.Name, ExplorerItemKind.QueryableObject, ExplorerIcon.Table)
+                    {
+                        IsEnumerable = true,
+                        ToolTipText = FormatTypeName(p.PropertyType, false),
 
-                // Display all properties of type IEnumerable<T> (except for string!)
-                let ienumerableOfT = prop.PropertyType.GetInterface("System.Collections.Generic.IEnumerable`1")
-                where ienumerableOfT != null
-
-                orderby prop.Name
-
-                select new ExplorerItem(prop.Name, ExplorerItemKind.QueryableObject, ExplorerIcon.Table)
-                {
-                    IsEnumerable = true,
-                    ToolTipText = FormatTypeName(prop.PropertyType, false),
-
-                    // Store the entity type to the Tag property. We'll use it later.
-                    Tag = ienumerableOfT.GetGenericArguments()[0]
-                }
-
-            ).ToList();
+                        // Store the entity type to the Tag property. We'll use it later.
+                        Tag = p.PropertyType.GetGenericArguments().First()
+                    })
+                    .ToList();
 
             // Create a lookup keying each element type to the properties of that type. This will allow
             // us to build hyperlink targets allowing the user to click between associations:
             var elementTypeLookup = topLevelProps.ToLookup(tp => (Type)tp.Tag);
 
             // Populate the columns (properties) of each entity:
-            foreach (ExplorerItem table in topLevelProps)
+            foreach (var table in topLevelProps)
             {
-                Type parentType = (Type)table.Tag;
+                var parentType = (Type)table.Tag;
                 var props = parentType.GetProperties().Select(p => GetChildItem(elementTypeLookup, p.Name, p.PropertyType));
                 var fields = parentType.GetFields().Select(f => GetChildItem(elementTypeLookup, f.Name, f.FieldType));
                 table.Children = props.Union(fields).OrderBy(childItem => childItem.Kind).ToList();
             }
 
             return topLevelProps;
+        }
+
+        public override bool ShowConnectionDialog(IConnectionInfo cxInfo, ConnectionDialogOptions dialogOptions)
+            => new ConnectionDialog(cxInfo).ShowDialog() == true;
+
+        [Conditional("DEBUG")]
+        private static void EnableDebugExceptions()
+        {
+            AppDomain.CurrentDomain.FirstChanceException += (sender, args) =>
+            {
+                if (args.Exception.StackTrace.Contains(typeof(EfDriver).Namespace))
+                    Debug();
+            };
         }
 
         ExplorerItem GetChildItem(ILookup<Type, ExplorerItem> elementTypeLookup, string childPropName, Type childPropType)
@@ -93,10 +82,10 @@ namespace Ef6.Core.LINQPadDriver
                 };
 
             // Is the property's type a collection of entities?
-            Type ienumerableOfT = childPropType.GetInterface("System.Collections.Generic.IEnumerable`1");
+            var ienumerableOfT = childPropType.GetInterface("System.Collections.Generic.IEnumerable`1");
             if (ienumerableOfT != null)
             {
-                Type elementType = ienumerableOfT.GetGenericArguments()[0];
+                var elementType = ienumerableOfT.GetGenericArguments()[0];
                 if (elementTypeLookup.Contains(elementType))
                     return new ExplorerItem(childPropName, ExplorerItemKind.CollectionLink, ExplorerIcon.OneToMany)
                     {
@@ -107,7 +96,14 @@ namespace Ef6.Core.LINQPadDriver
 
             // Ordinary property:
             return new ExplorerItem(childPropName + " (" + FormatTypeName(childPropType, false) + ")",
-                ExplorerItemKind.Property, ExplorerIcon.Column);
+                                    ExplorerItemKind.Property, ExplorerIcon.Column);
+        }
+
+        [Conditional("DEBUG")]
+        private static void Debug()
+        {
+            if (!Debugger.IsAttached)
+                Debugger.Launch();
         }
     }
 }
