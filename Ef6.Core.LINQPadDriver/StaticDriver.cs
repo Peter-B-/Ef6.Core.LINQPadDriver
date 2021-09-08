@@ -14,12 +14,17 @@ namespace Ef6.Core.LINQPadDriver
     {
         static StaticDriver()
         {
-            // Uncomment the following code to attach to Visual Studio's debugger when an exception is thrown:
-            //AppDomain.CurrentDomain.FirstChanceException += (sender, args) =>
-            //{
-            //	if (args.Exception.StackTrace.Contains ("Ef6.Core.LINQPadDriver"))
-            //		Debugger.Launch ();
-            //};
+            EnableDebugExceptions();
+        }
+
+        [Conditional("DEBUG")]
+        private static void EnableDebugExceptions()
+        {
+            AppDomain.CurrentDomain.FirstChanceException += (sender, args) =>
+            {
+                if (args.Exception.StackTrace.Contains(typeof(StaticDriver).Namespace))
+                    Debugger.Launch();
+            };
         }
 
         public override string Name => "Enitiy Framework 6 on .Net Core";
