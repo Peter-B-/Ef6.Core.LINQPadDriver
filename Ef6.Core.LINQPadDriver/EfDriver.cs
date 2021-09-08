@@ -7,6 +7,7 @@ using LINQPad.Extensibility.DataContext;
 
 namespace Ef6.Core.LINQPadDriver
 {
+    // ReSharper disable once UnusedMember.Global
     public class EfDriver : StaticDataContextDriver
     {
         static EfDriver()
@@ -21,10 +22,21 @@ namespace Ef6.Core.LINQPadDriver
         public override string GetConnectionDescription(IConnectionInfo cxInfo)
             => cxInfo.CustomTypeInfo.GetCustomTypeDescription();
 
+        public override object[] GetContextConstructorArguments(IConnectionInfo cxInfo)
+            => new object[]
+            {
+                cxInfo.DatabaseInfo.GetCxString()
+            };
+
+        public override ParameterDescriptor[] GetContextConstructorParameters(IConnectionInfo cxInfo)
+            => new[]
+            {
+                new ParameterDescriptor("connectionString", "System.String")
+            };
+
         public override List<ExplorerItem> GetSchema(IConnectionInfo cxInfo, Type customType)
         {
             // Return all DbSet<T> properties of the DbContext
-            Debug();
             var topLevelProps =
                 customType.GetProperties()
                     .Where(p => p.PropertyType.IsGenericType &&
@@ -60,16 +72,23 @@ namespace Ef6.Core.LINQPadDriver
             => new ConnectionDialog(cxInfo).ShowDialog() == true;
 
         [Conditional("DEBUG")]
+        private static void Debug()
+        {
+            if (!Debugger.IsAttached)
+                Debugger.Launch();
+        }
+
+        [Conditional("DEBUG")]
         private static void EnableDebugExceptions()
         {
             AppDomain.CurrentDomain.FirstChanceException += (sender, args) =>
             {
-                if (args.Exception.StackTrace.Contains(typeof(EfDriver).Namespace))
+                if (args.Exception.StackTrace?.Contains(typeof(EfDriver).Namespace ?? string.Empty) == true)
                     Debug();
             };
         }
 
-        ExplorerItem GetChildItem(ILookup<Type, ExplorerItem> elementTypeLookup, string childPropName, Type childPropType)
+        private static ExplorerItem GetChildItem(ILookup<Type, ExplorerItem> elementTypeLookup, string childPropName, Type childPropType)
         {
             // If the property's type is in our list of entities, then it's a Many:1 (or 1:1) reference.
             // We'll assume it's a Many:1 (we can't reliably identify 1:1s purely from reflection).
@@ -97,13 +116,6 @@ namespace Ef6.Core.LINQPadDriver
             // Ordinary property:
             return new ExplorerItem(childPropName + " (" + FormatTypeName(childPropType, false) + ")",
                                     ExplorerItemKind.Property, ExplorerIcon.Column);
-        }
-
-        [Conditional("DEBUG")]
-        private static void Debug()
-        {
-            if (!Debugger.IsAttached)
-                Debugger.Launch();
         }
     }
 }
