@@ -20,6 +20,14 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="linqpad-samples\\*.*" />
+    <None Remove="Connection.png" />
+    <None Remove="FailedConnection.png" />
+    <Content Include="Connection.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FailedConnection.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Folder Include="linqpad-samples\\" />
   </ItemGroup>
   <Target Name="PostBuild1" AfterTargets="PostBuildEvent">
