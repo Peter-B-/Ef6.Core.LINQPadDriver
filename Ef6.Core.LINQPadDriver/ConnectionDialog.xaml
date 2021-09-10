@@ -5,7 +5,9 @@
     Background="{x:Static SystemColors.ControlBrush}"
     SizeToContent="Height"
     Width="500" 
-    WindowStartupLocation="CenterScreen">
+    WindowStartupLocation="CenterScreen"
+    WindowStyle="ToolWindow"
+    >
     <StackPanel Margin="12">
 
         <DockPanel>
