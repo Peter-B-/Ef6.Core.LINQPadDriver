@@ -32,7 +32,7 @@ jobs:
     - name: Test
       run: dotnet test --no-build --verbosity normal
     - name: Publish NuGet
-      if: ${{ github.event.inputs.publish != '')
+      if: ${{ github.event.inputs.publish != '' }}
       uses: brandedoutcast/publish-nuget@v2.5.5
       with:
         PROJECT_FILE_PATH: Ef6.Core.LINQPadDriver\Ef6.Core.LINQPadDriver.csproj
