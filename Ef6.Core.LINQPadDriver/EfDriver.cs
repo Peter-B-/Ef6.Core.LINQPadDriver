@@ -79,18 +79,16 @@ namespace Ef6.Core.LINQPadDriver
 
             return topLevelProps;
         }
-        
+
         public override ICustomMemberProvider GetCustomDisplayMemberProvider(object objectToWrite)
         {
             if (objectToWrite == null)
-            {
                 return null;
-            }
             if (!EntityFrameworkMemberProvider.IsEntity(objectToWrite.GetType()))
-            {
                 return null;
-            }
-            return new EntityFrameworkMemberProvider(objectToWrite);
+
+            var res = new EntityFrameworkMemberProvider(objectToWrite);
+            return res;
         }
 
         public override bool ShowConnectionDialog(IConnectionInfo cxInfo, ConnectionDialogOptions dialogOptions)
