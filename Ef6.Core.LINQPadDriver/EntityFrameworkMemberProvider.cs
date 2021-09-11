@@ -30,7 +30,8 @@ namespace Ef6.Core.LINQPadDriver
             var navProps = new HashSet<string>(GetNavPropNames(objectContext, objectToWrite) ?? Array.Empty<string>());
             var source = (from m in objectToWrite.GetType().GetMembers()
                 where m.MemberType == MemberTypes.Field || m.MemberType == MemberTypes.Property
-                where (m.MemberType != MemberTypes.Field || m.Name != "_entityWrapper") && (m.MemberType != MemberTypes.Property || m.Name != "RelationshipManager")
+                where (m.MemberType != MemberTypes.Field || m.Name != "_entityWrapper") &&
+                    (m.MemberType != MemberTypes.Property || m.Name != "RelationshipManager")
                 let isNav = navProps.Contains(m.Name)
                 let type = GetFieldPropType(m)
                 orderby isNav, m.MetadataToken
@@ -39,7 +40,8 @@ namespace Ef6.Core.LINQPadDriver
                     m.Name,
                     type,
                     value = ((isNav && (IsUnloadedEntityAssociation(dbContext, objectToWrite, m) ?? true))
-                        ? InternalUtil.OnDemand(m.Name, () => entityFrameworkMemberProvider.GetFieldPropValue(objectToWrite, m), runOnNewThread: false, typeof(IEnumerable).IsAssignableFrom(type))
+                        ? InternalUtil.OnDemand(m.Name, () => entityFrameworkMemberProvider.GetFieldPropValue(objectToWrite, m), runOnNewThread: false,
+                                                typeof(IEnumerable).IsAssignableFrom(type))
                         : entityFrameworkMemberProvider.GetFieldPropValue(objectToWrite, m))
                 }).ToList();
             names = source.Select(q => q.Name).ToArray();
@@ -117,9 +119,11 @@ namespace Ef6.Core.LINQPadDriver
             Type type = val.GetType();
             if (getItemMethod == null)
                 getItemMethod = type.GetMethods(BindingFlags.Instance | BindingFlags.Public)
-                    .FirstOrDefault(m => m.Name == "TryGetItem" && m.IsGenericMethod && m.GetParameters().Length == 3 && m.GetParameters()[0].ParameterType == typeof(string) && m.GetParameters()[1].ParameterType.Name == "DataSpace" && m.GetParameters()[2].IsOut);
+                    .FirstOrDefault(m => m.Name == "TryGetItem" && m.IsGenericMethod && m.GetParameters().Length == 3 &&
+                                        m.GetParameters()[0].ParameterType == typeof(string) && m.GetParameters()[1].ParameterType.Name == "DataSpace" &&
+                                        m.GetParameters()[2].IsOut);
             if (getItemMethod == null) return null;
-            var type2 = type.Assembly.GetType("System.Data.Entity.Core.Metadata.Edm.EntityContainer") ?? 
+            var type2 = type.Assembly.GetType("System.Data.Entity.Core.Metadata.Edm.EntityContainer") ??
                 type.Assembly.GetType("System.Data.Metadata.Edm.EntityContainer");
             if (type2 == null) return null;
             var methodInfo = getItemMethod.MakeGenericMethod(type2);
@@ -134,7 +138,9 @@ namespace Ef6.Core.LINQPadDriver
             if (obj == null) return null;
             if (getEntitySetMethod == null || getEntitySetMethod.ReflectedType != obj.GetType())
                 getEntitySetMethod = obj.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public)
-                    .FirstOrDefault(m => m.Name == "TryGetEntitySetByName" && m.GetParameters().Length == 3 && m.GetParameters()[0].ParameterType == typeof(string) && m.GetParameters()[1].ParameterType == typeof(bool) && m.GetParameters()[2].IsOut);
+                    .FirstOrDefault(m => m.Name == "TryGetEntitySetByName" && m.GetParameters().Length == 3 &&
+                                        m.GetParameters()[0].ParameterType == typeof(string) && m.GetParameters()[1].ParameterType == typeof(bool) &&
+                                        m.GetParameters()[2].IsOut);
             if (getEntitySetMethod == null) return null;
             array = new object[]
             {

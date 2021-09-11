@@ -1,11 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Data.Entity.Core.Metadata.Edm;
-using System.Data.Entity.Infrastructure;
 using System.Diagnostics;
-using System.Dynamic;
 using System.Linq;
-using System.Reflection;
 using LINQPad;
 using LINQPad.Extensibility.DataContext;
 
@@ -48,6 +44,17 @@ namespace Ef6.Core.LINQPadDriver
             };
         }
 
+        public override ICustomMemberProvider GetCustomDisplayMemberProvider(object objectToWrite)
+        {
+            if (objectToWrite == null)
+                return null;
+            if (!EntityFrameworkMemberProvider.IsEntity(objectToWrite.GetType()))
+                return null;
+
+            var res = new EntityFrameworkMemberProvider(objectToWrite);
+            return res;
+        }
+
         public override List<ExplorerItem> GetSchema(IConnectionInfo cxInfo, Type customType)
         {
             // Return all DbSet<T> properties of the DbContext
@@ -78,17 +85,6 @@ namespace Ef6.Core.LINQPadDriver
             }
 
             return topLevelProps;
-        }
-
-        public override ICustomMemberProvider GetCustomDisplayMemberProvider(object objectToWrite)
-        {
-            if (objectToWrite == null)
-                return null;
-            if (!EntityFrameworkMemberProvider.IsEntity(objectToWrite.GetType()))
-                return null;
-
-            var res = new EntityFrameworkMemberProvider(objectToWrite);
-            return res;
         }
 
         public override bool ShowConnectionDialog(IConnectionInfo cxInfo, ConnectionDialogOptions dialogOptions)

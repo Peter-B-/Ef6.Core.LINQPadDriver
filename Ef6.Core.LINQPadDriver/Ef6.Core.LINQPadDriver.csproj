@@ -1,49 +1,49 @@
 <Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
-	<PropertyGroup>
-		<TargetFramework>netcoreapp3.1</TargetFramework>
-		<UseWpf>true</UseWpf>
-		<AssemblyName>Ef6.Core.LINQPadDriver</AssemblyName>
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWpf>true</UseWpf>
+    <AssemblyName>Ef6.Core.LINQPadDriver</AssemblyName>
 
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<Version>0.1.0</Version>
-		<Authors>Peter-B-</Authors>
-		<Description>A LINQPad 6 driver for Entity Framework 6 DB-contexts, running on .Net Core or .Net.</Description>
-		<PackageProjectUrl>https://github.com/Peter-B-/Ef6.Core.LINQPadDriver</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/Peter-B-/Ef6.Core.LINQPadDriver</RepositoryUrl>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageTags>linqpad-driver</PackageTags>
-	</PropertyGroup>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>0.1.0</Version>
+    <Authors>Peter-B-</Authors>
+    <Description>A LINQPad 6 driver for Entity Framework 6 DB-contexts, running on .Net Core or .Net.</Description>
+    <PackageProjectUrl>https://github.com/Peter-B-/Ef6.Core.LINQPadDriver</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Peter-B-/Ef6.Core.LINQPadDriver</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>linqpad-driver</PackageTags>
+  </PropertyGroup>
 
-	<PropertyGroup>
-		<DefineConstants>NETCORE</DefineConstants>
-	</PropertyGroup>
+  <PropertyGroup>
+    <DefineConstants>NETCORE</DefineConstants>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="EntityFramework" Version="6.4.4" />
-		<PackageReference Include="LINQPad.Reference" Version="1.*" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="EntityFramework" Version="6.4.4" />
+    <PackageReference Include="LINQPad.Reference" Version="1.*" />
+  </ItemGroup>
 
-	<ItemGroup>
-		<None Update="ConnectionDialog.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</None>
-	</ItemGroup>
+  <ItemGroup>
+    <None Update="ConnectionDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+  </ItemGroup>
 
-	<ItemGroup>
+  <ItemGroup>
     <Folder Include="linqpad-samples\\" />
-		<Content Include="linqpad-samples\\*.*" />
+    <Content Include="linqpad-samples\\*.*" />
 
     <None Remove="Connection.png" />
-		<None Remove="FailedConnection.png" />
-		<Content Include="Connection.png">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="FailedConnection.png">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-	</ItemGroup>
+    <None Remove="FailedConnection.png" />
+    <Content Include="Connection.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FailedConnection.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
   <Target Name="PostBuild1" AfterTargets="PostBuildEvent">
-		<Exec Command="xcopy /i/y/s &quot;$(TargetDir)*.*&quot; &quot;%25LocalAppData%25\\LINQPad\\Drivers\\DataContext\\NetCore\\$(TargetName)&quot;" />
-	</Target>
+    <Exec Command="xcopy /i/y/s &quot;$(TargetDir)*.*&quot; &quot;%25LocalAppData%25\\LINQPad\\Drivers\\DataContext\\NetCore\\$(TargetName)&quot;" />
+  </Target>
 </Project>

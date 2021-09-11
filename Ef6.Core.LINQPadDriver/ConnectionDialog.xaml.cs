@@ -3,15 +3,17 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using LINQPad.Extensibility.DataContext;
+using LINQPad.Extensibility.DataContext.UI;
+using Microsoft.Win32;
 
 namespace Ef6.Core.LINQPadDriver
 {
     /// <summary>
-    /// Interaction logic for ConnectionDialog.xaml
+    ///     Interaction logic for ConnectionDialog.xaml
     /// </summary>
     public partial class ConnectionDialog : Window
     {
-        IConnectionInfo _cxInfo;
+        readonly IConnectionInfo _cxInfo;
 
         public ConnectionDialog(IConnectionInfo cxInfo)
         {
@@ -20,38 +22,38 @@ namespace Ef6.Core.LINQPadDriver
             InitializeComponent();
         }
 
-        void btnOK_Click(object sender, RoutedEventArgs e)
-        {
-            DialogResult = true;
-        }
-
-        void BrowseAssembly(object sender, RoutedEventArgs e)
-        {
-            var dialog = new Microsoft.Win32.OpenFileDialog()
-            {
-                Title = "Choose custom assembly",
-                DefaultExt = ".dll",
-            };
-
-            if (dialog.ShowDialog() == true)
-                _cxInfo.CustomTypeInfo.CustomAssemblyPath = dialog.FileName;
-        }
-
         void BrowseAppConfig(object sender, RoutedEventArgs e)
         {
-            var dialog = new Microsoft.Win32.OpenFileDialog()
+            var dialog = new OpenFileDialog
             {
                 Title = "Choose application config file",
-                DefaultExt = ".config",
+                DefaultExt = ".config"
             };
 
             if (dialog.ShowDialog() == true)
                 _cxInfo.AppConfigPath = dialog.FileName;
         }
 
+        void BrowseAssembly(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog
+            {
+                Title = "Choose custom assembly",
+                DefaultExt = ".dll"
+            };
+
+            if (dialog.ShowDialog() == true)
+                _cxInfo.CustomTypeInfo.CustomAssemblyPath = dialog.FileName;
+        }
+
+        void btnOK_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = true;
+        }
+
         void ChooseType(object sender, RoutedEventArgs e)
         {
-            string assemPath = _cxInfo.CustomTypeInfo.CustomAssemblyPath;
+            var assemPath = _cxInfo.CustomTypeInfo.CustomAssemblyPath;
             if (assemPath.Length == 0)
             {
                 MessageBox.Show("First enter a path to an assembly.");
@@ -74,13 +76,14 @@ namespace Ef6.Core.LINQPadDriver
                 MessageBox.Show("Error obtaining custom types: " + ex.Message);
                 return;
             }
+
             if (customTypes.Length == 0)
             {
                 MessageBox.Show("There are no public types based on \"System.Data.Entity.DbContext\" in that assembly.");
                 return;
             }
 
-            string result = (string)LINQPad.Extensibility.DataContext.UI.Dialogs.PickFromList("Choose Custom Type", customTypes);
+            var result = (string)Dialogs.PickFromList("Choose Custom Type", customTypes);
             if (result != null) _cxInfo.CustomTypeInfo.CustomTypeName = result;
         }
     }
