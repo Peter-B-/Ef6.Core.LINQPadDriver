@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Diagnostics;
 using System.Linq;
 using LINQPad;
@@ -85,6 +86,12 @@ namespace Ef6.Core.LINQPadDriver
             }
 
             return topLevelProps;
+        }
+
+        public override void InitializeContext(IConnectionInfo cxInfo, object context, QueryExecutionManager executionManager)
+        {
+            base.InitializeContext(cxInfo, context, executionManager);
+            if (context is DbContext dbContext) dbContext.Database.Log = executionManager.SqlTranslationWriter.WriteLine;
         }
 
         public override bool ShowConnectionDialog(IConnectionInfo cxInfo, ConnectionDialogOptions dialogOptions)
