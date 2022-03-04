@@ -18,14 +18,31 @@ Pick your EF6 assembly and select your DbContext type. Provide the full connecti
 Your DbContext must have a public constructor accepting a `nameOrConnectionString` string as a parameter:
 
 ```csharp
-    public class MyDbContext : DbContext
+public class MyDbContext : DbContext
+{
+    public MyDbContext(string nameOrConnectionString) : base(nameOrConnectionString)
     {
-        public MyDbContext(string nameOrConnectionString) : base(nameOrConnectionString)
-        {
-        }
-        
-        // additional constructors are allowed
     }
+    
+    // additional constructors are allowed
+}
 ```
 
 The driver has been tested with EntityFramework 6.4.4 and dotConnect for Oracle 9.14.1273.
+
+# Grouping
+The driver supports grouping DbSets by decorating them with a `System.ComponentModel.Category` attribute.
+
+```csharp
+public class MyDbContext : DbContext
+{
+    [Category("Groups")]
+    public virtual DbSet<UserGroup> UserGroups { get; set; }
+
+    [Category("Users")]
+    public virtual DbSet<User> Users { get; set; }
+}
+```
+
+![Grouping example](docs/groups.png)
+
