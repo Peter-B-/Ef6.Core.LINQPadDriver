@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data.Entity;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using LINQPad;
 using LINQPad.Extensibility.DataContext;
 
@@ -58,34 +60,52 @@ namespace Ef6.Core.LINQPadDriver
 
         public override List<ExplorerItem> GetSchema(IConnectionInfo cxInfo, Type customType)
         {
-            // Return all DbSet<T> properties of the DbContext
-            var topLevelProps =
+            // DbSets can be grouped using the System.ComponentModel.CategoryAttribute.
+            // DbSets wuthout this Attribute will be returned as top level items.
+            var topLevelNodes =
                 customType
                     .GetDbSetProperties()
-                    .Select(p => new ExplorerItem(p.Name, ExplorerItemKind.QueryableObject, ExplorerIcon.Table)
+                    .GroupBy(p => p.CustomAttributes
+                                 .FirstOrDefault(cad => cad.AttributeType == typeof(CategoryAttribute))
+                                 ?.ConstructorArguments.First().Value?.ToString()
+                    )
+                    .OrderBy(gr => gr.Key == null)
+                    .ThenBy(gr => gr.Key)
+                    .SelectMany(gr =>
                     {
-                        IsEnumerable = true,
-                        ToolTipText = FormatTypeName(p.PropertyType, false),
-
-                        // Store the entity type to the Tag property. We'll use it later.
-                        Tag = p.PropertyType.GetGenericArguments().First()
+                        if (gr.Key == null)
+                            // No category set. Return individual DbSets as nodes.
+                            return gr.Select(CreateExplorerItem);
+                        else
+                            return new List<ExplorerItem>
+                            {
+                                // Return single node with DbSets as children
+                                new ExplorerItem(gr.Key, ExplorerItemKind.Category, ExplorerIcon.Box)
+                                {
+                                    Children = gr.Select(CreateExplorerItem).ToList(),
+                                }
+                            };
                     })
+                    .ToList();
+
+            var queryableObjects =
+                GetItemsOfKindRecursive(topLevelNodes, ExplorerItemKind.QueryableObject)
                     .ToList();
 
             // Create a lookup keying each element type to the properties of that type. This will allow
             // us to build hyperlink targets allowing the user to click between associations:
-            var elementTypeLookup = topLevelProps.ToLookup(tp => (Type)tp.Tag);
+            var elementTypeLookup = queryableObjects.ToLookup(tp => (Type) tp.Tag);
 
             // Populate the columns (properties) of each entity:
-            foreach (var table in topLevelProps)
+            foreach (var table in queryableObjects)
             {
-                var parentType = (Type)table.Tag;
+                var parentType = (Type) table.Tag;
                 var props = parentType.GetProperties().Select(p => GetChildItem(elementTypeLookup, p.Name, p.PropertyType));
                 var fields = parentType.GetFields().Select(f => GetChildItem(elementTypeLookup, f.Name, f.FieldType));
                 table.Children = props.Union(fields).OrderBy(childItem => childItem.Kind).ToList();
             }
 
-            return topLevelProps;
+            return topLevelNodes;
         }
 
         public override void InitializeContext(IConnectionInfo cxInfo, object context, QueryExecutionManager executionManager)
@@ -96,6 +116,18 @@ namespace Ef6.Core.LINQPadDriver
 
         public override bool ShowConnectionDialog(IConnectionInfo cxInfo, ConnectionDialogOptions dialogOptions)
             => new ConnectionDialog(cxInfo).ShowDialog() == true;
+
+        private static ExplorerItem CreateExplorerItem(PropertyInfo p)
+        {
+            return new ExplorerItem(p.Name, ExplorerItemKind.QueryableObject, ExplorerIcon.Table)
+            {
+                IsEnumerable = true,
+                ToolTipText = FormatTypeName(p.PropertyType, false),
+
+                // Store the entity type to the Tag property. We'll use it later.
+                Tag = p.PropertyType.GetGenericArguments().First()
+            };
+        }
 
         [Conditional("DEBUG")]
         private static void EnableDebugExceptions()
@@ -135,6 +167,18 @@ namespace Ef6.Core.LINQPadDriver
             // Ordinary property:
             return new ExplorerItem(childPropName + " (" + FormatTypeName(childPropType, false) + ")",
                                     ExplorerItemKind.Property, ExplorerIcon.Column);
+        }
+
+        private static IEnumerable<ExplorerItem> GetItemsOfKindRecursive(IEnumerable<ExplorerItem> items, ExplorerItemKind kind)
+        {
+            foreach (var item in items)
+            {
+                if (item.Kind == kind)
+                    yield return item;
+                if (item.Children != null)
+                    foreach (var child in GetItemsOfKindRecursive(item.Children, kind))
+                        yield return child;
+            }
         }
     }
 }
