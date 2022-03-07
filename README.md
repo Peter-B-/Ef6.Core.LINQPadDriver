@@ -44,5 +44,14 @@ public class MyDbContext : DbContext
 }
 ```
 
+You can also apply the `System.ComponentModel.Category` attribute to the entity:
+ ```csharp
+[Category("Users")]
+public class User
+{
+    ...
+}
+```
+
 ![Grouping example](docs/groups.png)
 
