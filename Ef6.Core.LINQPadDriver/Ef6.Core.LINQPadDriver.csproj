@@ -5,7 +5,7 @@
     <AssemblyName>Ef6.Core.LINQPadDriver</AssemblyName>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.1.4</Version>
+    <Version>0.1.5</Version>
     <Authors>Peter Butzhammer</Authors>
     <Description>A LINQPad 6 driver for Entity Framework 6 DB-contexts, running on .Net Core or .Net.</Description>
     <PackageProjectUrl>https://github.com/Peter-B-/Ef6.Core.LINQPadDriver</PackageProjectUrl>

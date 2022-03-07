@@ -67,8 +67,8 @@ namespace Ef6.Core.LINQPadDriver
             var topLevelNodes =
                 customType
                     .GetDbSetProperties()
-                    .GroupBy(p => p.CustomAttributes
-                                 .FirstOrDefault(cad => cad.AttributeType == typeof(CategoryAttribute))
+                    .GroupBy(p => (p.TryGetAttribute<CategoryAttribute>()??
+                                     p.PropertyType.GetGenericArguments().FirstOrDefault()?.TryGetAttribute<CategoryAttribute>())
                                  ?.ConstructorArguments.First().Value?.ToString()
                     )
                     .OrderBy(gr => gr.Key == null)
