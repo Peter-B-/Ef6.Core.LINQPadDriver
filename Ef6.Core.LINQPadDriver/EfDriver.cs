@@ -60,6 +60,8 @@ namespace Ef6.Core.LINQPadDriver
 
         public override List<ExplorerItem> GetSchema(IConnectionInfo cxInfo, Type customType)
         {
+            if (customType == null) throw new ArgumentException($"No custom type selected. Please check the properties of this connection.");
+
             // DbSets can be grouped using the System.ComponentModel.CategoryAttribute.
             // DbSets wuthout this Attribute will be returned as top level items.
             var topLevelNodes =
