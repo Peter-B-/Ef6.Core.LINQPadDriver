@@ -68,7 +68,7 @@ public class EfDriver : StaticDataContextDriver
             customType
                 .GetDbSetProperties()
                 .GroupBy(p => (p.TryGetAttribute<CategoryAttribute>() ??
-                                 p.PropertyType.GetGenericArguments().FirstOrDefault()?.TryGetAttribute<CategoryAttribute>())
+                                 p.PropertyType.GetDbSetType()?.TryGetAttribute<CategoryAttribute>())
                              ?.ConstructorArguments.First().Value?.ToString()
                 )
                 .OrderBy(gr => gr.Key == null)
@@ -127,7 +127,7 @@ public class EfDriver : StaticDataContextDriver
             ToolTipText = FormatTypeName(p.PropertyType, false),
 
             // Store the entity type to the Tag property. We'll use it later.
-            Tag = p.PropertyType.GetGenericArguments().First()
+            Tag = p.PropertyType.GetDbSetType()
         };
     }
 
