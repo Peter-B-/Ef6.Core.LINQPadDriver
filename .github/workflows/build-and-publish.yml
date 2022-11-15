@@ -28,16 +28,11 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build --configuration Release --no-restore --output .\Release
     - name: Test
       run: dotnet test --no-build --verbosity normal
     - name: Publish NuGet
       if: ${{ github.event.inputs.publish != '' }}
-      uses: brandedoutcast/publish-nuget@v2.5.5
-      with:
-        PROJECT_FILE_PATH: Ef6.Core.LINQPadDriver\Ef6.Core.LINQPadDriver.csproj
-        NUGET_KEY: ${{secrets.NUGET_API_KEY}}  
-        INCLUDE_SYMBOLS: false
-        
+      run: dotnet nuget push ".\Release\*.nupkg" --api-key ${{secrets.nuget_api_key}} --source https://api.nuget.org/v3/index.json       
       
     
