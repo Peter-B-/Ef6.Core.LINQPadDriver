@@ -16,19 +16,19 @@ public static class EfContextExtensions
             .OrderBy(p => p.Name);
     }
 
-    public static IEnumerable<Type> GetDbSetTypes(this Type dbContextType)
-    {
-        return dbContextType.GetDbSetProperties()
-            .Select(p => p.PropertyType.GetGenericArguments().First());
-    }
-
     /// <summary>
-    /// Returns TEntity for a DbSet&lt;TEntity&gt; type
+    ///     Returns TEntity for a DbSet&lt;TEntity&gt; type
     /// </summary>
     /// <param name="dbSetType"></param>
     /// <returns></returns>
     public static Type GetDbSetType(this Type dbSetType)
     {
         return dbSetType.GetGenericArguments().FirstOrDefault();
+    }
+
+    public static IEnumerable<Type> GetDbSetTypes(this Type dbContextType)
+    {
+        return dbContextType.GetDbSetProperties()
+            .Select(p => p.PropertyType.GetGenericArguments().First());
     }
 }

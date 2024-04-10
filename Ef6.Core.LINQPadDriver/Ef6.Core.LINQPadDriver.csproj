@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6-windows</TargetFramework>
-    <LangVersion>10.0</LangVersion>
+    <LangVersion>12.0</LangVersion>
 
     <UseWpf>true</UseWpf>
     <AssemblyName>Ef6.Core.LINQPadDriver</AssemblyName>
