@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8-windows</TargetFramework>
 
@@ -6,9 +6,9 @@
     <AssemblyName>Ef6.Core.LINQPadDriver</AssemblyName>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.1.0</Version>
+    <Version>2.0.0-dev</Version>
     <Authors>Peter Butzhammer</Authors>
-    <Description>A LINQPad 6 driver for Entity Framework 6 DB-contexts, running on .Net Core or .Net.</Description>
+    <Description>A LINQPad driver for Entity Framework 6 DB-contexts, running on .Net (not Framework).</Description>
     <PackageProjectUrl>https://github.com/Peter-B-/Ef6.Core.LINQPadDriver</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Peter-B-/Ef6.Core.LINQPadDriver</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
