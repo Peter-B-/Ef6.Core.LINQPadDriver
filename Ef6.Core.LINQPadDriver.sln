@@ -5,11 +5,6 @@ VisualStudioVersion = 18.3.11312.210
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ef6.Core.LINQPadDriver", "Ef6.Core.LINQPadDriver\Ef6.Core.LINQPadDriver.csproj", "{741120F4-65C5-4B81-B046-9ACA5AD32132}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{045E193C-7AFA-4A47-BDBC-D58D406B7785}"
-	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ef6Demo", "Ef6Demo", "{EB4E9EC2-8A75-4456-B4DB-3929F6969F3F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ef6Demo.Startup", "Ef6Demo\Ef6Demo.Startup\Ef6Demo.Startup.csproj", "{E92DC2D0-70A6-42A5-BA7C-B9D627C076AE}"
@@ -17,6 +12,15 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ef6Demo.ModelFirst", "Ef6Demo\Ef6Demo.ModelFirst\Ef6Demo.ModelFirst.csproj", "{FE65AB25-72AB-4E27-8EDC-CCE6CE6E76F2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ef6Demo.CodeFirst", "Ef6Demo\Ef6Demo.CodeFirst\Ef6Demo.CodeFirst.csproj", "{8DA4E76D-1BBE-0FE4-E12A-2A76A883998C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "_Solution Items", "{90867EFE-F15C-4099-BEC2-F0D00ABC657B}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		Logo.pdn = Logo.pdn
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
