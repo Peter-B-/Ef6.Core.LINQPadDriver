@@ -6,6 +6,10 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ef6.Core.LINQPadDriver", "Ef6.Core.LINQPadDriver\Ef6.Core.LINQPadDriver.csproj", "{741120F4-65C5-4B81-B046-9ACA5AD32132}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ef6Demo", "Ef6Demo", "{EB4E9EC2-8A75-4456-B4DB-3929F6969F3F}"
+	ProjectSection(SolutionItems) = preProject
+		Ef6Demo\CodeFirst.linq = Ef6Demo\CodeFirst.linq
+		Ef6Demo\ModelFirst.linq = Ef6Demo\ModelFirst.linq
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ef6Demo.Startup", "Ef6Demo\Ef6Demo.Startup\Ef6Demo.Startup.csproj", "{E92DC2D0-70A6-42A5-BA7C-B9D627C076AE}"
 EndProject
