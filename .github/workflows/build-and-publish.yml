@@ -24,15 +24,15 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: 10.0.x
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --configuration Release --no-restore --output .\Release
+      run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
     - name: Publish NuGet
       if: ${{ github.event.inputs.publish != '' }}
-      run: dotnet nuget push ".\Release\*.nupkg" --api-key ${{secrets.nuget_api_key}} --source https://api.nuget.org/v3/index.json       
+      run: dotnet nuget push ".\Ef6.Core.LINQPadDriver\bin\Release\net8-windows\Release\*.nupkg" --api-key ${{secrets.nuget_api_key}} --source https://api.nuget.org/v3/index.json       
       
     
