@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Entity;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using LINQPad;
 using LINQPad.Extensibility.DataContext;
@@ -20,20 +17,19 @@ public class EfDriver : StaticDataContextDriver
 
     public override string Author => "Peter Butzhammer";
 
-    public override string Name => "Enitiy Framework 6 on .Net Core";
+    public override string Name => "Entity Framework 6 on .Net Core";
 
     public override string GetConnectionDescription(IConnectionInfo cxInfo)
-        => cxInfo.CustomTypeInfo.GetCustomTypeDescription();
+    {
+        return cxInfo.CustomTypeInfo.GetCustomTypeDescription();
+    }
 
     public override object[] GetContextConstructorArguments(IConnectionInfo cxInfo)
     {
         if (string.IsNullOrEmpty(cxInfo.DatabaseInfo.CustomCxString))
-            return Array.Empty<object>();
+            return [];
 
-        return new object[]
-        {
-            cxInfo.DatabaseInfo.CustomCxString
-        };
+        return [cxInfo.DatabaseInfo.CustomCxString];
     }
 
     public override ParameterDescriptor[] GetContextConstructorParameters(IConnectionInfo cxInfo)
@@ -41,13 +37,10 @@ public class EfDriver : StaticDataContextDriver
         if (string.IsNullOrEmpty(cxInfo.DatabaseInfo.CustomCxString))
             return Array.Empty<ParameterDescriptor>();
 
-        return new ParameterDescriptor[1]
-        {
-            new ParameterDescriptor("param", "System.String")
-        };
+        return [new ParameterDescriptor("param", "System.String")];
     }
 
-    public override ICustomMemberProvider GetCustomDisplayMemberProvider(object objectToWrite)
+    public override ICustomMemberProvider? GetCustomDisplayMemberProvider(object? objectToWrite)
     {
         if (objectToWrite == null)
             return null;
@@ -63,13 +56,13 @@ public class EfDriver : StaticDataContextDriver
         if (customType == null) throw new ArgumentException("No custom type selected. Please check the properties of this connection.");
 
         // DbSets can be grouped using the System.ComponentModel.CategoryAttribute.
-        // DbSets wuthout this Attribute will be returned as top level items.
+        // DbSets without this Attribute will be returned as top level items.
         var topLevelNodes =
             customType
                 .GetDbSetProperties()
                 .GroupBy(p => (p.TryGetAttribute<CategoryAttribute>() ??
-                                 p.PropertyType.GetDbSetType()?.TryGetAttribute<CategoryAttribute>())
-                             ?.ConstructorArguments.First().Value?.ToString()
+                               p.PropertyType.GetDbSetType()?.TryGetAttribute<CategoryAttribute>())
+                    ?.ConstructorArguments.First().Value?.ToString()
                 )
                 .OrderBy(gr => gr.Key == null)
                 .ThenBy(gr => gr.Key)
@@ -78,15 +71,14 @@ public class EfDriver : StaticDataContextDriver
                     if (gr.Key == null)
                         // No category set. Return individual DbSets as nodes.
                         return gr.Select(CreateExplorerItem);
-                    else
-                        return new List<ExplorerItem>
+                    return new List<ExplorerItem>
+                    {
+                        // Return single node with DbSets as children
+                        new(gr.Key, ExplorerItemKind.Category, ExplorerIcon.Box)
                         {
-                            // Return single node with DbSets as children
-                            new ExplorerItem(gr.Key, ExplorerItemKind.Category, ExplorerIcon.Box)
-                            {
-                                Children = gr.Select(CreateExplorerItem).ToList(),
-                            }
-                        };
+                            Children = gr.Select(CreateExplorerItem).ToList()
+                        }
+                    };
                 })
                 .ToList();
 
@@ -96,12 +88,12 @@ public class EfDriver : StaticDataContextDriver
 
         // Create a lookup keying each element type to the properties of that type. This will allow
         // us to build hyperlink targets allowing the user to click between associations:
-        var elementTypeLookup = queryableObjects.ToLookup(tp => (Type) tp.Tag);
+        var elementTypeLookup = queryableObjects.ToLookup(tp => (Type)tp.Tag);
 
         // Populate the columns (properties) of each entity:
         foreach (var table in queryableObjects)
         {
-            var parentType = (Type) table.Tag;
+            var parentType = (Type)table.Tag;
             var props = parentType.GetProperties().Select(p => GetChildItem(elementTypeLookup, p.Name, p.PropertyType));
             var fields = parentType.GetFields().Select(f => GetChildItem(elementTypeLookup, f.Name, f.FieldType));
             table.Children = props.Union(fields).OrderBy(childItem => childItem.Kind).ToList();
@@ -117,7 +109,9 @@ public class EfDriver : StaticDataContextDriver
     }
 
     public override bool ShowConnectionDialog(IConnectionInfo cxInfo, ConnectionDialogOptions dialogOptions)
-        => new ConnectionDialog(cxInfo).ShowDialog() == true;
+    {
+        return new ConnectionDialog(cxInfo).ShowDialog() == true;
+    }
 
     private static ExplorerItem CreateExplorerItem(PropertyInfo p)
     {
@@ -168,7 +162,7 @@ public class EfDriver : StaticDataContextDriver
 
         // Ordinary property:
         return new ExplorerItem(childPropName + " (" + FormatTypeName(childPropType, false) + ")",
-                                ExplorerItemKind.Property, ExplorerIcon.Column);
+            ExplorerItemKind.Property, ExplorerIcon.Column);
     }
 
     private static IEnumerable<ExplorerItem> GetItemsOfKindRecursive(IEnumerable<ExplorerItem> items, ExplorerItemKind kind)

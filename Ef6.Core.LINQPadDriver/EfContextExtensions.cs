@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Data.Entity;
-using System.Linq;
 using System.Reflection;
 
 namespace Ef6.Core.LINQPadDriver;
@@ -12,7 +9,7 @@ public static class EfContextExtensions
     {
         return dbContextType.GetProperties()
             .Where(p => p.PropertyType.IsGenericType &&
-                       p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>))
+                        p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>))
             .OrderBy(p => p.Name);
     }
 
@@ -21,7 +18,7 @@ public static class EfContextExtensions
     /// </summary>
     /// <param name="dbSetType"></param>
     /// <returns></returns>
-    public static Type GetDbSetType(this Type dbSetType)
+    public static Type? GetDbSetType(this Type dbSetType)
     {
         return dbSetType.GetGenericArguments().FirstOrDefault();
     }

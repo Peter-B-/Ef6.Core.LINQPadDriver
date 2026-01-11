@@ -7,16 +7,11 @@ namespace Ef6.Core.LINQPadDriver;
 ///     Wrapper to read/write connection properties. This acts as our ViewModel - we will bind to it in
 ///     ConnectionDialog.xaml.
 /// </summary>
-class ConnectionProperties
+internal sealed class ConnectionProperties(IConnectionInfo cxInfo)
 {
-    public ConnectionProperties(IConnectionInfo cxInfo)
-    {
-        ConnectionInfo = cxInfo;
-    }
+    public IConnectionInfo ConnectionInfo { get; } = cxInfo;
 
-    public IConnectionInfo ConnectionInfo { get; }
-
-    XElement DriverData => ConnectionInfo.DriverData;
+    private XElement DriverData => ConnectionInfo.DriverData;
 
     // This is how to create custom connection properties.
 
