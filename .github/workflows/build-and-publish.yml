@@ -33,6 +33,6 @@ jobs:
       run: dotnet test --no-build --verbosity normal
     - name: Publish NuGet
       if: ${{ github.event.inputs.publish != '' }}
-      run: dotnet nuget push ".\Ef6.Core.LINQPadDriver\bin\Release\net8-windows\Release\*.nupkg" --api-key ${{secrets.nuget_api_key}} --source https://api.nuget.org/v3/index.json       
+      run: dotnet nuget push ".\Ef6.Core.LINQPadDriver\bin\Release\*.nupkg" --api-key ${{secrets.nuget_api_key}} --source https://api.nuget.org/v3/index.json       
       
     
